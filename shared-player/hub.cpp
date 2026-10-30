@@ -25,21 +25,21 @@ Hub::Hub(QObject *parent)
 
     connect(m_player, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error), this,
             [this](QMediaPlayer::Error) {
-                scheduleReload(QStringLiteral("erreur ") + m_player->errorString());
+                scheduleReload(QStringLiteral("error ") + m_player->errorString());
             });
     connect(m_player, &QMediaPlayer::mediaStatusChanged, this,
             [this](QMediaPlayer::MediaStatus status) {
                 if (status == QMediaPlayer::EndOfMedia || status == QMediaPlayer::InvalidMedia) {
-                    scheduleReload(QStringLiteral("fin de flux"));
+                    scheduleReload(QStringLiteral("end of stream"));
                 }
             });
 
-    // Chien de garde : relance si la position n'avance plus
+    // Watchdog: reload when the position stops moving
     m_watchdog.setInterval(30000);
     connect(&m_watchdog, &QTimer::timeout, this, [this]() {
         const qint64 position = m_player->position();
         if (m_fanout->sinkCount() > 0 && position == m_lastPosition) {
-            scheduleReload(QStringLiteral("flux fige"));
+            scheduleReload(QStringLiteral("frozen stream"));
         }
         m_lastPosition = position;
     });
@@ -52,23 +52,23 @@ void Hub::setUrl(const QUrl &url)
         return;
     }
     m_url = url;
-    scheduleReload(QStringLiteral("adresse ") + url.toString());
+    scheduleReload(QStringLiteral("url ") + url.toString());
 }
 
 void Hub::addSink(QAbstractVideoSurface *sink)
 {
     const bool wasEmpty = m_fanout->sinkCount() == 0;
     m_fanout->addSink(sink);
-    qWarning() << "isslive-shared: ecran ajoute, total" << m_fanout->sinkCount();
+    qWarning() << "isslive-shared: screen added, total" << m_fanout->sinkCount();
     if (wasEmpty) {
-        scheduleReload(QStringLiteral("premier ecran"));
+        scheduleReload(QStringLiteral("first screen"));
     }
 }
 
 void Hub::removeSink(QAbstractVideoSurface *sink)
 {
     m_fanout->removeSink(sink);
-    qWarning() << "isslive-shared: ecran retire, total" << m_fanout->sinkCount();
+    qWarning() << "isslive-shared: screen removed, total" << m_fanout->sinkCount();
     if (m_fanout->sinkCount() == 0) {
         m_retry.stop();
         m_player->stop();
@@ -77,8 +77,8 @@ void Hub::removeSink(QAbstractVideoSurface *sink)
 
 void Hub::scheduleReload(const QString &reason)
 {
-    qWarning() << "isslive-shared: relance dans 5 s :" << reason;
-    // Regroupe les demandes rapprochees (demarrage de plusieurs ecrans)
+    qWarning() << "isslive-shared: reload in 5 s:" << reason;
+    // Merges close requests (several screens starting at once)
     m_retry.start();
 }
 

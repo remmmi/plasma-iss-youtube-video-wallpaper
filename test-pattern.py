@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# Mire d'alignement : une fenetre sans bordure par ecran, lignes horizontales
-# aux memes coordonnees du bureau virtuel sur tous les ecrans.
-# Fermeture : Echap, clic, ou au bout de 5 minutes.
+# Alignment test pattern: one borderless window per screen, horizontal lines
+# at the same virtual desktop coordinates on every screen.
+# Closes on Escape, on a click, or after 5 minutes.
 import re
 import subprocess
 import tkinter as tk

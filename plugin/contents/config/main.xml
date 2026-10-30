@@ -7,15 +7,15 @@
     <entry name="Source" type="String">
       <default>http://127.0.0.1:8890/iss.m3u8</default>
     </entry>
-    <!-- 0 : image entiere sur chaque ecran, 1 : une image etalee sur tous les ecrans -->
+    <!-- 0: whole picture on each screen, 1: one picture spanned across all screens -->
     <entry name="Layout" type="Int">
       <default>0</default>
     </entry>
-    <!-- 0 : bandeau avec noir, 1 : rogne plein ecran, 2 : etire -->
+    <!-- 0: letterboxed with black bars, 1: cropped to fill, 2: stretched -->
     <entry name="FillMode" type="Int">
       <default>0</default>
     </entry>
-    <!-- Mode etale : position physique du coin haut gauche de l'ecran, en mm -->
+    <!-- Spanned mode: physical position of the top left corner of the screen, in mm -->
     <entry name="AutoPosition" type="Bool">
       <default>true</default>
     </entry>
@@ -24,6 +24,13 @@
     </entry>
     <entry name="PositionY" type="Int">
       <default>0</default>
+    </entry>
+    <!-- Deblocking filter on the graphics card, strength from 0 to 100 -->
+    <entry name="Deblock" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="DeblockStrength" type="Int">
+      <default>70</default>
     </entry>
   </group>
 </kcfg>

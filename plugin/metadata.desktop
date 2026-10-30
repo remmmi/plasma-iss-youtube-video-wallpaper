@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=ISS en direct
-Comment=Flux live de l'ISS (Sen) via un relais HLS local
+Name=ISS live
+Comment=ISS live stream (Sen) through a local HLS relay
 Type=Service
 Icon=video-television
 X-KDE-ServiceTypes=Plasma/Wallpaper

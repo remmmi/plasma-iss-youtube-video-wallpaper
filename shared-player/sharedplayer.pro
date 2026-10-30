@@ -1,5 +1,5 @@
-# Module QML local.isslive.shared : un seul lecteur video partage par tous
-# les fonds d'ecran ISS de plasmashell (un decodage pour tous les ecrans).
+# QML module local.isslive.shared: a single video player shared by all the
+# ISS wallpapers of plasmashell (one decode for all screens).
 TEMPLATE = lib
 TARGET = sharedplayerplugin
 CONFIG += plugin c++17 release

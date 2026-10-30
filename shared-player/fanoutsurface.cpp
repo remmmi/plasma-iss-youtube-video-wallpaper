@@ -10,8 +10,8 @@ FanoutSurface::FanoutSurface(QObject *parent)
 QList<QVideoFrame::PixelFormat> FanoutSurface::supportedPixelFormats(
     QAbstractVideoBuffer::HandleType type) const
 {
-    // Images en memoire systeme seulement : une texture GL appartiendrait au
-    // contexte d'une seule fenetre et ne servirait pas aux autres ecrans.
+    // System memory frames only: a GL texture would belong to the context of a
+    // single window and could not be used by the other screens.
     if (type != QAbstractVideoBuffer::NoHandle) {
         return {};
     }
@@ -83,7 +83,7 @@ void FanoutSurface::addSink(QAbstractVideoSurface *sink)
         return;
     }
     m_sinks.append(sink);
-    // Un ecran ajoute en cours de lecture demarre avec le format courant
+    // A screen added during playback starts with the current format
     if (isActive()) {
         sink->start(surfaceFormat());
     }

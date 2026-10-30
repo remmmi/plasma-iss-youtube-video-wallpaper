@@ -1,13 +1,13 @@
 pragma Singleton
 import QtQuick 2.12
 
-// Objet partage par tous les fonds d'ecran du plugin (un par ecran) dans
-// plasmashell. En mode etale, chaque ecran y inscrit son rectangle physique
-// (en mm) ; la toile commune est le rectangle qui les englobe tous.
+// Object shared by all the wallpapers of the plugin (one per screen) in
+// plasmashell. In spanned mode each screen registers its physical rectangle
+// (in mm); the common canvas is the rectangle enclosing all of them.
 QtObject {
     id: bus
 
-    // Rectangles physiques des ecrans en mode etale, par instance de fond
+    // Physical rectangles of the screens in spanned mode, per wallpaper instance
     property var physicalRects: ({})
     property rect canvas: Qt.rect(0, 0, 0, 0)
 
@@ -37,6 +37,6 @@ QtObject {
             }
         }
         canvas = Qt.rect(x1, y1, x2 - x1, y2 - y1)
-        console.warn("isslive: toile " + canvas.width + "x" + canvas.height + " mm")
+        console.warn("isslive: canvas " + canvas.width + "x" + canvas.height + " mm")
     }
 }

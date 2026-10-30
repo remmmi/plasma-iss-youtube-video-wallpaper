@@ -5,9 +5,9 @@
 #include <QPointer>
 #include <QUrl>
 
-// Source a donner a un VideoOutput (VideoOutput { source: ... }). Le
-// VideoOutput lui confie sa surface par la propriete videoSurface ; elle est
-// branchee sur le lecteur unique du processus.
+// Source for a VideoOutput (VideoOutput { source: ... }). The VideoOutput
+// hands over its surface through the videoSurface property; that surface is
+// plugged into the single player of the process.
 class SharedVideoSource : public QObject
 {
     Q_OBJECT

@@ -4,9 +4,9 @@
 #include <QList>
 #include <QPointer>
 
-// Surface video unique donnee au lecteur, qui redistribue chaque image aux
-// surfaces des VideoOutput (une par ecran). Les QVideoFrame sont partagees
-// par compteur de references : pas de copie de l'image decodee.
+// Single video surface given to the player, which forwards every frame to the
+// surfaces of the VideoOutput items (one per screen). QVideoFrame objects are
+// reference counted: the decoded picture is never copied.
 class FanoutSurface : public QAbstractVideoSurface
 {
     Q_OBJECT

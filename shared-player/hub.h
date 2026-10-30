@@ -8,8 +8,8 @@
 class FanoutSurface;
 class QAbstractVideoSurface;
 
-// Lecteur unique du processus. Gere la lecture, la reconnexion apres erreur
-// et le chien de garde (flux fige). Les ecrans s'y branchent par addSink.
+// Single player of the process. Handles playback, reconnection after an error
+// and the watchdog (frozen stream). Screens plug into it with addSink.
 class Hub : public QObject
 {
     Q_OBJECT

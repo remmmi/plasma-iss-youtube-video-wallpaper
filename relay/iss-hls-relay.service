@@ -1,5 +1,5 @@
 [Unit]
-Description=Relais HLS local du direct ISS (yt-dlp + ffmpeg)
+Description=Local HLS relay of the ISS live stream (yt-dlp + ffmpeg)
 After=network-online.target
 StartLimitIntervalSec=0
 

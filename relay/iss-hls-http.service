@@ -1,5 +1,5 @@
 [Unit]
-Description=Serveur HTTP local du relais ISS (127.0.0.1:8890)
+Description=Local HTTP server of the ISS relay (127.0.0.1:8890)
 
 [Service]
 ExecStartPre=/bin/mkdir -p %t/iss-hls

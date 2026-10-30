@@ -1,7 +1,7 @@
-# Sauvegardes de la configuration personnelle (Plasma, kscreen, xrandr)
+# Backups of the personal configuration (Plasma, kscreen, xrandr)
 backup/
 
-# Compilation du module C++
+# Build of the C++ module
 shared-player/build/
 shared-player/build.mk
 shared-player/.qmake.stash

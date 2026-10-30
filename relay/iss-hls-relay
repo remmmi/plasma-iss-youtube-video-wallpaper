@@ -1,7 +1,7 @@
 #!/bin/bash
-# Relais HLS local du direct YouTube de l'ISS (Sen).
-# Recupere l'URL signee avec yt-dlp, recopie le flux 1080p sans reencodage
-# vers un HLS local, et s'arrete avant l'expiration de l'URL : systemd relance.
+# Local HLS relay of the ISS YouTube live stream (Sen).
+# Gets the signed URL with yt-dlp, copies the 1080p stream without re-encoding
+# to a local HLS playlist, and stops before the URL expires: systemd restarts it.
 set -euo pipefail
 
 VIDEO_URL="${ISS_VIDEO_URL:-https://www.youtube.com/watch?v=fO9e9jnhYK8}"
@@ -13,7 +13,7 @@ mkdir -p "$OUT_DIR"
 
 url=$("$HOME/.local/bin/yt-dlp" --js-runtimes node --no-warnings -g -f "$FORMAT" "$VIDEO_URL" | head -n1)
 if [ -z "$url" ]; then
-    echo "yt-dlp n'a renvoye aucune URL" >&2
+    echo "yt-dlp returned no URL" >&2
     exit 1
 fi
 
@@ -24,7 +24,7 @@ if [ -n "$expire" ] && [ "$expire" -gt $((now + MARGIN + 60)) ]; then
 else
     duration=3600
 fi
-echo "URL obtenue, relais pendant ${duration}s"
+echo "URL obtained, relaying for ${duration}s"
 
 exec timeout --signal=INT "$duration" ffmpeg -hide_banner -loglevel warning -nostdin \
     -rw_timeout 20000000 -i "$url" \

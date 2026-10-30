@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# Calage du BenQ (HDMI-1 / DPY-1) a l'oeil, mire affichee sur les trois ecrans.
-#   Haut / Bas      : decale le BenQ de 10 pixels
-#   + / -           : agrandit / reduit le contenu du BenQ
-#   Entree          : garde le reglage et l'ecrit dans calage-resultat.txt
-#   Echap           : remet le reglage de depart et quitte
+# Aligns the BenQ screen (HDMI-1 / DPY-1) by eye, test pattern on all three screens.
+#   Up / Down       : moves the BenQ by 10 pixels
+#   + / -           : enlarges / shrinks the BenQ content
+#   Enter           : keeps the setting and writes it to align-result.txt
+#   Escape          : restores the initial setting and quits
 import re
 import subprocess
 import tkinter as tk
@@ -11,7 +11,7 @@ from pathlib import Path
 
 STEP = 20
 PANEL_BAND = 220
-RESULT = Path(__file__).with_name("calage-resultat.txt")
+RESULT = Path(__file__).with_name("align-result.txt")
 
 
 def metamode(width, y):
@@ -44,7 +44,7 @@ def current():
     return 1536, 866
 
 
-class Calage:
+class Aligner:
     def __init__(self):
         self.start = current()
         self.width, self.y = self.start
@@ -60,7 +60,7 @@ class Calage:
         colors = ["#ff4040", "#40ff40", "#4080ff", "#ffff40", "#ff40ff"]
         for name, w, h, x, y in screens():
             if name == "HDMI-3":
-                # Bande libre en bas du HP pour la fenetre de commande
+                # Free band at the bottom of the HP screen for the control window
                 h -= PANEL_BAND
             win = tk.Toplevel(self.root)
             win.overrideredirect(True)
@@ -81,29 +81,29 @@ class Calage:
                     c.create_line(0, ly, w, ly, fill="#808080", width=1)
             if name == "HDMI-1":
                 text = (f"BenQ  {self.width}x{round(self.width * 9 / 16)}  +3000+{self.y}\n"
-                        "Reglage dans la fenetre Calage BenQ")
+                        "Adjust in the BenQ alignment window")
                 c.create_text(w // 2, h // 2, text=text, fill="white", justify="center",
                               font=("DejaVu Sans", 20, "bold"))
             self.windows.append(win)
         self.control()
 
     def control(self):
-        # Fenetre normale (decoree) : seule a pouvoir recevoir le clavier
+        # Regular (decorated) window: the only one that can get keyboard input
         if getattr(self, "panel", None) is not None:
             self.panel.destroy()
         p = tk.Toplevel(self.root)
         self.panel = p
-        p.title("Calage BenQ")
+        p.title("BenQ alignment")
         p.geometry(f"+700+{653 + 1080 - PANEL_BAND + 20}")
         p.attributes("-topmost", True)
         tk.Label(p, text=f"BenQ {self.width}x{round(self.width * 9 / 16)} +3000+{self.y}",
                  font=("DejaVu Sans", 14, "bold")).grid(row=0, column=0, columnspan=4, pady=6)
-        buttons = (("Monter", self.up), ("Descendre", self.down),
-                   ("Agrandir", self.bigger), ("Reduire", self.smaller))
+        buttons = (("Up", self.up), ("Down", self.down),
+                   ("Bigger", self.bigger), ("Smaller", self.smaller))
         for i, (label, handler) in enumerate(buttons):
             tk.Button(p, text=label, width=10, command=handler).grid(row=1, column=i, padx=4, pady=4)
-        tk.Button(p, text="Garder", width=10, command=self.keep).grid(row=2, column=1, pady=6)
-        tk.Button(p, text="Annuler", width=10, command=self.cancel).grid(row=2, column=2, pady=6)
+        tk.Button(p, text="Keep", width=10, command=self.keep).grid(row=2, column=1, pady=6)
+        tk.Button(p, text="Cancel", width=10, command=self.cancel).grid(row=2, column=2, pady=6)
         for key, handler in (("<Up>", self.up), ("<Down>", self.down),
                              ("<plus>", self.bigger), ("<KP_Add>", self.bigger),
                              ("<minus>", self.smaller), ("<KP_Subtract>", self.smaller),
@@ -117,14 +117,14 @@ class Calage:
         apply(width, y)
         self.root.after(1500, self.draw)
 
-    # Fleche haut : le contenu du BenQ monte (y augmente)
+    # Up arrow: the BenQ content moves up (y increases)
     def up(self, _e=None):
         self.change(self.width, self.y + 10)
 
     def down(self, _e=None):
         self.change(self.width, self.y - 10)
 
-    # Agrandir le contenu = moins de pixels logiques sur le meme ecran
+    # Bigger content means fewer logical pixels on the same screen
     def bigger(self, _e=None):
         self.change(self.width - 32, self.y)
 
@@ -140,4 +140,4 @@ class Calage:
         self.root.destroy()
 
 
-Calage().root.mainloop()
+Aligner().root.mainloop()

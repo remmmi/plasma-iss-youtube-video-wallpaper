@@ -1,9 +1,9 @@
 /*
- *  ISS en direct : fond d'ecran video Plasma 5 lisant le relais HLS local
- *  (service systemd --user iss-hls-relay).
- *  La lecture est faite par le module C++ local.isslive.shared : un seul
- *  lecteur pour tous les ecrans (un decodage, images identiques donc
- *  synchronisees), muet, avec reconnexion et chien de garde.
+ *  ISS live: Plasma 5 video wallpaper playing the local HLS relay
+ *  (systemd --user service iss-hls-relay).
+ *  Playback is done by the C++ module local.isslive.shared: a single player
+ *  for all screens (one decode, identical frames so the screens stay in
+ *  sync), muted, with reconnection and a watchdog.
  */
 
 import QtQuick 2.12
@@ -22,19 +22,19 @@ Rectangle {
     readonly property int fillModeIndex: wallpaper.configuration.FillMode
     readonly property bool autoPosition: wallpaper.configuration.AutoPosition
 
-    // Ecran de ce fond, en coordonnees du bureau virtuel
+    // Screen of this wallpaper, in virtual desktop coordinates
     readonly property rect screenRect: Qt.rect(Screen.virtualX, Screen.virtualY, Screen.width, Screen.height)
     readonly property string screenName: Screen.name
-    // Cle propre a cette instance dans SyncBus : un fond detruit (plasmashell
-    // en recree parfois au demarrage) ne doit pas effacer celle du suivant
+    // Key of this instance in SyncBus: a destroyed wallpaper (plasmashell
+    // sometimes recreates them at startup) must not erase the next one's entry
     readonly property string busKey: "isslive-" + Math.random().toString(36).slice(2)
 
-    // Densite de cet ecran en pixels par mm (tailles physiques de xrandr)
+    // Density of this screen in pixels per mm (physical sizes from xrandr)
     readonly property real pxPerMm: Screen.pixelDensity > 0 ? Screen.pixelDensity : 3.78
 
-    // Mode etale : position physique (mm) du coin haut gauche de l'ecran.
-    // En automatique, on la deduit de la disposition des ecrans avec la plus
-    // grande taille de pixel du bureau, pour que les ecrans ne se chevauchent pas.
+    // Spanned mode: physical position (mm) of the top left corner of the screen.
+    // In automatic mode it is derived from the screen layout using the largest
+    // pixel size of the desktop, so that screens do not overlap.
     function referenceMmPerPx() {
         var screens = Qt.application.screens
         var best = 1 / pxPerMm
@@ -54,7 +54,7 @@ Rectangle {
             var k = referenceMmPerPx()
             var autoX = Math.round(screenRect.x * k)
             var autoY = Math.round(screenRect.y * k)
-            // Affiche la position calculee dans les reglages
+            // Shows the computed position in the settings
             if (wallpaper.configuration.PositionX !== autoX) {
                 wallpaper.configuration.PositionX = autoX
             }
@@ -70,8 +70,8 @@ Rectangle {
                                                   screenRect.width / pxPerMm,
                                                   screenRect.height / pxPerMm)
 
-    // Mise a jour differee : elle ecrit dans la config, ce qui ne doit pas
-    // se faire pendant l'evaluation d'une liaison
+    // Deferred update: it writes to the config, which must not happen while
+    // a binding is being evaluated
     function scheduleUpdate() { Qt.callLater(root.updatePhysicalRect) }
     onSpannedChanged: spanned ? scheduleUpdate() : SyncBus.removePhysicalRect(busKey)
     onAutoPositionChanged: scheduleUpdate()
@@ -93,12 +93,22 @@ Rectangle {
         fillMode: root.fillModeIndex === 1 ? VideoOutput.PreserveAspectCrop
                 : root.fillModeIndex === 2 ? VideoOutput.Stretch
                 : VideoOutput.PreserveAspectFit
-        // En mode etale, la video couvre toute la toile physique, mise a
-        // l'echelle de cet ecran : un mm reste un mm d'un ecran a l'autre
+        // In spanned mode the video covers the whole physical canvas, scaled
+        // for this screen: a mm stays a mm from one screen to the next
         x: root.spanned ? (SyncBus.canvas.x - root.physicalRect.x) * root.pxPerMm : 0
         y: root.spanned ? (SyncBus.canvas.y - root.physicalRect.y) * root.pxPerMm : 0
         width: root.spanned ? SyncBus.canvas.width * root.pxPerMm : root.width
         height: root.spanned ? SyncBus.canvas.height * root.pxPerMm : root.height
+    }
+
+    Deblock {
+        anchors.fill: parent
+        visible: wallpaper.configuration.Deblock
+        source: videoOutput
+        strength: wallpaper.configuration.DeblockStrength / 100
+        // Display scale of the video: screen pixels per source pixel
+        blockSize: videoOutput.sourceRect.width > 0
+                   ? 8 * videoOutput.contentRect.width / videoOutput.sourceRect.width : 8
     }
 
     Component.onCompleted: scheduleUpdate()

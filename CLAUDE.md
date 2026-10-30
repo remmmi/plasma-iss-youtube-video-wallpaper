@@ -1,8 +1,8 @@
 # wallpaper-video
 
-Flux live de sen.com en fond de bureau (ou économiseur d'écran) sous Debian 12 + KDE Plasma 5.27, session X11.
+Live stream of sen.com as the desktop wallpaper (or screensaver) on Debian 12 + KDE Plasma 5.27, X11 session.
 
-- Lire `NOTES.md` avant toute chose : état du projet, constats déjà vérifiés, décisions en attente. Ne pas refaire la recherche qui y figure.
-- Privilégier un outil existant plutôt que du code maison.
-- Consigner l'avancement dans des fichiers md de ce dossier, pas dans la mémoire de Claude.
-- Ne rien installer ni changer sur le bureau (fond d'écran, verrouillage) sans accord.
+- Read `NOTES.md` first: project status, findings already checked, pending decisions. Do not redo the research it contains.
+- Prefer an existing tool over custom code.
+- Record progress in the md files of this folder, not in Claude's memory.
+- Do not install or change anything on the desktop (wallpaper, screen locking) without approval.
