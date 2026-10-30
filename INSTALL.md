@@ -85,7 +85,7 @@ Goal: a window stretched across two screens has the same physical size and heigh
   - 11 % main thread: mostly the fork of plasmashell (about 900 MB) every 4 s by the org.kde.resourcesMonitor-fork widget, which runs awk to read /proc/net/dev. That fork also makes the pages copy-on-write, hence page faults in the decoder;
   - 9.5 % render thread: texture uploads to the NVIDIA driver.
   - The module code does not show up. A Rust rewrite using the same API would gain nothing.
-- Session lock (2026-10-30): `Hub` listens to the `ActiveChanged` signal of `org.freedesktop.ScreenSaver` (path `/ScreenSaver`) on the session bus, and reads `GetActive` at startup. While the session is locked the player is stopped, so nothing is decoded; on unlock it reloads at once. The relay keeps running (about 1 % of a core) so playback restarts without waiting for yt-dlp. Requires `QT += dbus`.
+- Session lock (2026-10-30): `Hub` listens to the `ActiveChanged` signal of `org.freedesktop.ScreenSaver` (path `/ScreenSaver`) on the session bus, and reads `GetActive` at startup. While the session is locked the player is stopped, so nothing is decoded; on unlock it reloads at once. The relay keeps running (about 1 % of a core) so playback restarts without waiting for yt-dlp. Requires `QT += dbus`. Measured: plasmashell at 63 % of a core unlocked, 1 % locked (no decoding thread left); the previous module kept decoding at 55 % while locked.
 
 ## Deblocking filter (2026-10-30)
 
