@@ -2,6 +2,9 @@
 #include "fanoutsurface.h"
 
 #include <QCoreApplication>
+#include <QDBusConnection>
+#include <QDBusInterface>
+#include <QDBusReply>
 #include <QDebug>
 
 Hub *Hub::instance()
@@ -38,12 +41,39 @@ Hub::Hub(QObject *parent)
     m_watchdog.setInterval(30000);
     connect(&m_watchdog, &QTimer::timeout, this, [this]() {
         const qint64 position = m_player->position();
-        if (m_fanout->sinkCount() > 0 && position == m_lastPosition) {
+        if (!m_locked && m_fanout->sinkCount() > 0 && position == m_lastPosition) {
             scheduleReload(QStringLiteral("frozen stream"));
         }
         m_lastPosition = position;
     });
     m_watchdog.start();
+
+    // Session lock: the screen locker of KDE announces it on the session bus
+    const QString service = QStringLiteral("org.freedesktop.ScreenSaver");
+    const QString path = QStringLiteral("/ScreenSaver");
+    QDBusConnection bus = QDBusConnection::sessionBus();
+    bus.connect(service, path, service, QStringLiteral("ActiveChanged"),
+                this, SLOT(onLockChanged(bool)));
+    QDBusInterface screenSaver(service, path, service, bus);
+    const QDBusReply<bool> active = screenSaver.call(QStringLiteral("GetActive"));
+    m_locked = active.isValid() && active.value();
+}
+
+void Hub::onLockChanged(bool locked)
+{
+    if (locked == m_locked) {
+        return;
+    }
+    m_locked = locked;
+    qWarning() << "isslive-shared: session" << (locked ? "locked, playback stopped" : "unlocked");
+    if (locked) {
+        m_retry.stop();
+        m_player->stop();
+        m_player->setMedia(QMediaContent());
+    } else {
+        m_retry.stop();
+        reload();
+    }
 }
 
 void Hub::setUrl(const QUrl &url)
@@ -87,7 +117,7 @@ void Hub::reload()
     m_lastPosition = -1;
     m_player->stop();
     m_player->setMedia(QMediaContent());
-    if (m_url.isValid() && m_fanout->sinkCount() > 0) {
+    if (m_url.isValid() && m_fanout->sinkCount() > 0 && !m_locked) {
         m_player->setMedia(m_url);
         m_player->play();
     }

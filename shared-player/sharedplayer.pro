@@ -3,7 +3,7 @@
 TEMPLATE = lib
 TARGET = sharedplayerplugin
 CONFIG += plugin c++17 release
-QT += qml quick multimedia
+QT += qml quick multimedia dbus
 
 SOURCES += plugin.cpp hub.cpp fanoutsurface.cpp sharedvideosource.cpp
 HEADERS += hub.h fanoutsurface.h sharedvideosource.h

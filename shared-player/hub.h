@@ -10,6 +10,7 @@ class QAbstractVideoSurface;
 
 // Single player of the process. Handles playback, reconnection after an error
 // and the watchdog (frozen stream). Screens plug into it with addSink.
+// Playback stops while the session is locked, to save the decoding CPU.
 class Hub : public QObject
 {
     Q_OBJECT
@@ -19,6 +20,9 @@ public:
     void setUrl(const QUrl &url);
     void addSink(QAbstractVideoSurface *sink);
     void removeSink(QAbstractVideoSurface *sink);
+
+private Q_SLOTS:
+    void onLockChanged(bool locked);
 
 private:
     explicit Hub(QObject *parent = nullptr);
@@ -31,4 +35,5 @@ private:
     QTimer m_watchdog;
     QUrl m_url;
     qint64 m_lastPosition = -1;
+    bool m_locked = false;
 };
