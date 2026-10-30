@@ -1,0 +1,1 @@
+DPY-2: nvidia-auto-select @1080x1920 +1920+0 {ViewPortIn=1080x1920, ViewPortOut=1920x1080+0+0, Rotation=90}, DPY-1: nvidia-auto-select @1472x828 +3000+866 {ViewPortIn=1472x828, ViewPortOut=1920x1080+0+0}, DPY-3: nvidia-auto-select @1920x1080 +0+653 {ViewPortIn=1920x1080, ViewPortOut=1920x1080+0+0}

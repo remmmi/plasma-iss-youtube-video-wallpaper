@@ -1,0 +1,35 @@
+#!/bin/bash
+# Relais HLS local du direct YouTube de l'ISS (Sen).
+# Recupere l'URL signee avec yt-dlp, recopie le flux 1080p sans reencodage
+# vers un HLS local, et s'arrete avant l'expiration de l'URL : systemd relance.
+set -euo pipefail
+
+VIDEO_URL="${ISS_VIDEO_URL:-https://www.youtube.com/watch?v=fO9e9jnhYK8}"
+FORMAT="${ISS_FORMAT:-bv*[height<=1080][vcodec^=avc1]/b[height<=1080]}"
+OUT_DIR="${ISS_OUT_DIR:-$XDG_RUNTIME_DIR/iss-hls}"
+MARGIN=600
+
+mkdir -p "$OUT_DIR"
+
+url=$("$HOME/.local/bin/yt-dlp" --js-runtimes node --no-warnings -g -f "$FORMAT" "$VIDEO_URL" | head -n1)
+if [ -z "$url" ]; then
+    echo "yt-dlp n'a renvoye aucune URL" >&2
+    exit 1
+fi
+
+now=$(date +%s)
+expire=$(printf '%s' "$url" | grep -oE '(expire/|expire=)[0-9]+' | grep -oE '[0-9]+' | head -n1 || true)
+if [ -n "$expire" ] && [ "$expire" -gt $((now + MARGIN + 60)) ]; then
+    duration=$((expire - now - MARGIN))
+else
+    duration=3600
+fi
+echo "URL obtenue, relais pendant ${duration}s"
+
+exec timeout --signal=INT "$duration" ffmpeg -hide_banner -loglevel warning -nostdin \
+    -rw_timeout 20000000 -i "$url" \
+    -map 0:v:0 -c copy -f hls \
+    -hls_time 4 -hls_list_size 6 \
+    -hls_flags delete_segments+append_list+omit_endlist+discont_start+temp_file \
+    -hls_segment_filename "$OUT_DIR/iss%d.ts" \
+    "$OUT_DIR/iss.m3u8"

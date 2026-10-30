@@ -1,0 +1,2 @@
+module local.isslive.shared
+plugin sharedplayerplugin

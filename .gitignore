@@ -1,0 +1,12 @@
+# Sauvegardes de la configuration personnelle (Plasma, kscreen, xrandr)
+backup/
+
+# Compilation du module C++
+shared-player/build/
+shared-player/build.mk
+shared-player/.qmake.stash
+*.o
+moc_*
+*.so
+
+__pycache__/

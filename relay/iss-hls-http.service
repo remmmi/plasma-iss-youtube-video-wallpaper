@@ -1,0 +1,12 @@
+[Unit]
+Description=Serveur HTTP local du relais ISS (127.0.0.1:8890)
+
+[Service]
+ExecStartPre=/bin/mkdir -p %t/iss-hls
+ExecStart=/usr/bin/python3 -m http.server 8890 --bind 127.0.0.1 --directory %t/iss-hls
+Restart=always
+RestartSec=5
+StandardError=null
+
+[Install]
+WantedBy=default.target
